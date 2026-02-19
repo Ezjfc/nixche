@@ -19,3 +19,8 @@ in
     openjdkMajorVersion = "17";
   }
 ```
+
+**Testing:**
+```bash
+nix-instantiate --eval --strict test-netbeans-java-platform.nix
+```
