@@ -6,8 +6,7 @@ let
     openjdk,
     openjdkMajorVersion,
     label ? "JDK ${openjdkMajorVersion} (Nix)",
-  }: let
-  in ''
+  }: ''
     <?xml version="1.0" encoding="UTF-8"?>
     <!DOCTYPE platform PUBLIC "-//NetBeans//DTD Java PlatformDefinition 1.0//EN" "http://www.netbeans.org/dtds/java-platformdefinition-1_0.dtd">
     <platform default="no" name="${label}">
@@ -31,7 +30,7 @@ let
     netBeansMajorVersion,
     label ? "JDK ${openjdkMajorVersion} (Nix)",
     dir ? "${dirPrefix}/${netBeansMajorVersion}/${dirSuffix}",
-    file ? "JDK_${openjdkMajorVersion}__Nix.xml",
+    file ? "JDK_${openjdkMajorVersion}_Nix.xml",
   }: let
     config = mkNetBeansJavaPlatform { inherit openjdk openjdkMajorVersion label; };
   in ''
