@@ -3,7 +3,7 @@ A collection of niche Nix utilities that fulfil quite specific tasks.
 
 ## Utilities
 
-### NetBeans Java Platform (`netbeans-java-platform.nix`)
+### NetBeans Java Platform (`java/create-netbeans-java-platform/`)
 Utilities for managing NetBeans Java Platform configurations.
 
 - `mkNetBeansJavaPlatform`: Creates a NetBeans Java Platform XML configuration
@@ -12,7 +12,7 @@ Utilities for managing NetBeans Java Platform configurations.
 **Usage example:**
 ```nix
 let
-  netbeans-utils = import ./netbeans-java-platform.nix;
+  netbeans-utils = import ./java/create-netbeans-java-platform;
 in
   netbeans-utils.mkNetBeansJavaPlatform {
     openjdk = pkgs.openjdk17;
@@ -22,5 +22,6 @@ in
 
 **Testing:**
 ```bash
-nix-instantiate --eval --strict test-netbeans-java-platform.nix
+cd java/create-netbeans-java-platform
+nix-instantiate --eval --strict test.nix
 ```

@@ -1,5 +1,5 @@
-# Test file for netbeans-java-platform.nix
-# Run with: nix-instantiate --eval --strict test-netbeans-java-platform.nix
+# Test file for create-netbeans-java-platform
+# Run with: nix-instantiate --eval --strict test.nix
 
 let
   # Mock pkgs for testing
@@ -8,7 +8,7 @@ let
     openjdk21 = "/nix/store/mock-openjdk21";
   };
 
-  netbeans-utils = import ./netbeans-java-platform.nix;
+  netbeans-utils = import ./default.nix;
 
   # Test mkNetBeansJavaPlatform
   test1 = netbeans-utils.mkNetBeansJavaPlatform {

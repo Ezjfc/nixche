@@ -2,6 +2,8 @@
 # License: Unlicense
 
 let
+  # Creates a NetBeans Java Platform XML configuration
+  # Note: Assumes OpenJDK is installed under ${openjdk}/lib/openjdk/ (standard Nix path)
   mkNetBeansJavaPlatform = {
     openjdk,
     openjdkMajorVersion,
