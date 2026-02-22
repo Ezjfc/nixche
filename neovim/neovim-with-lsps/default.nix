@@ -36,7 +36,7 @@ final: prev: {
       builtins.map (serverPackage: let
         program = serverPackage.meta.mainProgram;
       in ''
-        ln -s -t "$out" "${serverPackage}/bin/${program}"
+        ln -s -t "$out/bin" "${serverPackage}/bin/${program}"
       '') serverPackages
     );
 
