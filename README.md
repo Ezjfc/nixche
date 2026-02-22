@@ -9,21 +9,21 @@ Utilities for managing NetBeans Java Platform configurations.
 - `mkNetBeansJavaPlatform`: Creates a NetBeans Java Platform XML configuration (string).
 - `installNetBeansJavaPlatform`: Generates a shell script (string) to install Java Platform configuration to NetBeans.
 
-### Neovim Enable LSPs (`neovim/neovim-enable-lsps`)
+### Neovim With LSPs (`neovim/neovim-with-lsps`)
 A Nixpkgs overlay that patches Neovim to automatically enable Native LSPs on startup.
 Requires Neovim 0.11.0 or above (which introduced the built-in LSP client).
 
-Usage: apply the overlay and call `pkgs.neovim.enableLsps` with an attrset mapping
+Usage: apply the overlay and call `pkgs.neovim.withLsps` with an attrset mapping
 server names to their packages, e.g.:
 
 ```nix
-pkgs.neovim.enableLsps {
+pkgs.neovim.withLsps {
   lua_ls = pkgs.lua-language-server;
   nixd   = pkgs.nixd;
 }
 ```
 
-- `enableLsps`: Wraps `nvim` with `-c` flags that call `vim.lsp.enable()` for each server, and adds the server packages to the environment.
+- `withLsps`: Wraps `nvim` with `-c` flags that call `vim.lsp.enable()` for each server, and adds the server packages to the environment.
 
 ### Write Cat Script (`sh/write-cat-script`)
 Shell script wrappers that echo the script content to stderr before execution.
