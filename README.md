@@ -17,10 +17,12 @@ Usage: apply the overlay and call `pkgs.neovim.withLsps` with an attrset mapping
 server names to their packages, e.g.:
 
 ```nix
-pkgs.neovim.withLsps {
-  lua_ls = pkgs.lua-language-server;
-  nixd   = pkgs.nixd;
-}
+packages = with pkgs; [
+  (pkgs.neovim.withLsps {
+    lua_ls = pkgs.lua-language-server;
+    nixd   = pkgs.nixd;
+  })
+];
 ```
 
 - `withLsps`: Wraps `nvim` with `-c` flags that call `vim.lsp.enable()` for each server, and adds the server packages to the environment.
