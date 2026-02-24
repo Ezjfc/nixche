@@ -28,7 +28,9 @@ final: prev: {
     mkPrintArg = serverNames: let
       serverNames' = lib.concatStringsSep ", " serverNames;
       printScript = writeText "print-lsps.lua" ''
-        print("${msgScope}: enabling ${serverNames'}")
+          local mopt = vim.o.mopt
+          print("${msgScope}: enabling ${serverNames'}")
+          vim.o.mopt = mopt
       '';
     in "-c \"source ${printScript}\"";
     # Currently assume all language servers have meta.mainProgram.
@@ -53,7 +55,7 @@ final: prev: {
         mkdir -p "$out/bin"
         ln -s -t "$out" "${neovim}/share"
         makeWrapper "${neovim}/bin/nvim" "$out/bin/nvim" \
-          --add-flags '${mkPrintArg serverNames} ${mkServerArgs serverNames}'
+          --add-flags '${mkServerArgs serverNames} ${mkPrintArg serverNames}'
         ${mkServerLinks serverPackages}
       '';
     in nvimAndLsps;
@@ -63,4 +65,6 @@ final: prev: {
     "Please upgrade to ${needVersion} or above"
   ); neovim.overrideAttrs { passthru = (neovim.passthru or {}) // passthru'; };
 }
+
+
 
