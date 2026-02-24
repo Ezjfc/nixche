@@ -23,7 +23,7 @@
       };
     }) // {
       overlays = {
-        neovim-enable-lsps = import ./neovim/neovim-enable-lsps/default.nix;
+        neovim-with-lsps = import ./neovim/neovim-with-lsps/default.nix;
       };
     };
 }
