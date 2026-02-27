@@ -1,12 +1,59 @@
-# This is a Nixpkgs overlay that patches Neovim to automatically enable Native
-# LSPs.
+# This doc comment is written by Claude Sonnet 4.5, partially edited.
 #
-# Note: this overlay is created for NvChad but should work for general Neovim
-# setups with some small changes. More passthru functions might be needed when
-# the current is not enough to suit my needs, like "withLspsAndConfigs"...
+# A Nixpkgs overlay that wraps Neovim to automatically enable language servers
+# via Neovim's native LSP client (introduced in 0.11.0).
+#
+# --- Why does this exist? ---
+#
+# Neovim 0.11+ ships a built-in LSP client that can be configured with
+# `vim.lsp.enable("<server-name>")`. However, doing this in the conventional
+# ways has drawbacks:
+#   - Adding servers to your user/system Neovim config couples project-specific
+#     tooling to your global editor setup.
+#   - Mason and mason-lspconfig install servers imperatively at runtime,
+#     outside of Nix's control, leading to impure and unreproducible environments.
+#
+# This overlay lets you declare language servers as part of your project's Nix
+# expression instead. The resulting derivation handles both enabling the servers
+# via `vim.lsp.enable` at startup and making their binaries available to Neovim,
+# without touching your global Neovim config.
+#
+# This overlay solves the problem differently: it gives the Neovim derivation
+# a `withLsps` passthru function. Calling it produces a *new* derivation that:
+#   1. Wraps the `nvim` binary with `--cmd` flags that call
+#      `vim.lsp.enable("<server>")` for every requested server at startup,
+#      which is what causes servers to auto-attach to matching buffers.
+#   2. Symlinks every server binary into the same `bin/` directory as `nvim`,
+#      so they are guaranteed to be on PATH when Neovim runs.
+#
+# The result is a self-contained package you can put anywhere in a Nix
+# environment without needing NixOS modules or Home Manager.
+#
+# --- Usage ---
+#
+#   pkgs.neovim.withLsps {
+#     lua_ls        = pkgs.lua-language-server;
+#     ts_ls         = pkgs.typescript-language-server;
+#     rust_analyzer = pkgs.rust-analyzer;
+#   }
+#
+# The attribute *name* must match the server name expected by `vim.lsp.enable`
+# (usually the same name you would pass to nvim-lspconfig).
+# The attribute *value* is the Nixpkgs package for that server.
+#
+# --- Requirements ---
+#   - Neovim ≥ 0.11.0  (native LSP client with vim.lsp.enable)
+#   - The nvim-lspconfig plugin installed in your Neovim config — it supplies
+#     the per-language defaults (command, filetypes, settings) that
+#     vim.lsp.enable reads. The auto-attachment to buffers is handled by
+#     Neovim's native LSP client once vim.lsp.enable is called; lspconfig
+#     itself is just a configuration source.
 #
 # References:
-# - https://github.com/NixOS/nixpkgs/blob/19eeef59bc3f75b5a9ffa17ab86a3d9512d505e5/pkgs/by-name/pu/pulumi/with-packages.nix
+# - vim.lsp.enable docs:  https://neovim.io/doc/user/lsp.html
+# - nixpkgs wrapper pattern this is modelled on:
+#   https://github.com/NixOS/nixpkgs/blob/19eeef59bc3f75b5a9ffa17ab86a3d9512d505e5/pkgs/by-name/pu/pulumi/with-packages.nix
+
 final: prev: {
   neovim = let
     inherit (prev) neovim
