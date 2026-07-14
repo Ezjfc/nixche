@@ -20,10 +20,13 @@
           (builtins.readFile ./java/create-netbeans-java-platform/default.nix);
         write-cat-script = pkgs.writeText "write-cat-script"
           (builtins.readFile ./sh/write-cat-script/default.nix);
+        write-alias-script = pkgs.writeText "write-alias-script"
+          (builtins.readFile ./sh/write-alias-script/default.nix);
       };
     }) // {
       overlays = {
         neovim-with-lsps = import ./neovim/neovim-with-lsps/default.nix;
+        write-alias-script = import ./sh/write-alias-script/default.nix;
       };
     };
 }

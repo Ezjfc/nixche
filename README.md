@@ -27,6 +27,31 @@ packages = with pkgs; [
 
 - `withLsps`: Wraps `nvim` with `-c` flags that call `vim.lsp.enable()` for each server, and adds the server packages to the environment.
 
+### Write Alias Script (`sh/write-alias-script`)
+A Nixpkgs overlay that adds shell script wrappers for emulating shell aliases,
+which nix-direnv cannot export. The generated script removes the `PATH` entry
+it was resolved from before running the given content, so a script named after
+the command it wraps does not recurse into itself.
+
+Usage: apply the overlay, then e.g.:
+
+```nix
+packages = [
+  (pkgs.writeAliasScriptBin "ls" ''
+    exec ls --color=auto "$@"
+  '')
+];
+```
+
+Functions:
+- `writeAliasScript`: `writeShellScript`, but the script drops its own directory from `PATH` first.
+- `writeAliasScriptBin`: same for `writeShellScriptBin`.
+
+Caveat: the directory the script was *found in* is removed. In a devShell or
+plain store bin folder that is exactly the alias package; in a merged profile
+(e.g. home-manager's `buildEnv`) it hides the whole profile bin for the
+duration of the alias.
+
 ### Write Cat Script (`sh/write-cat-script`)
 Shell script wrappers that echo the script content to stderr before execution.
 
