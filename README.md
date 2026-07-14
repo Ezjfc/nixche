@@ -28,19 +28,23 @@ packages = with pkgs; [
 - `withLsps`: Wraps `nvim` with `-c` flags that call `vim.lsp.enable()` for each server, and adds the server packages to the environment.
 
 ### Write Alias Script (`sh/write-alias-script`)
-A Nixpkgs overlay that adds shell script wrappers for emulating shell aliases,
-which nix-direnv cannot export. The generated script removes the `PATH` entry
-it was resolved from before running the given content, so a script named after
-the command it wraps does not recurse into itself.
+Shell script wrappers for emulating shell aliases, which nix-direnv cannot
+export. The generated script removes the `PATH` entry it was resolved from
+before running the given content, so a script named after the command it wraps
+does not recurse into itself.
 
-Usage: apply the overlay, then e.g.:
+Usage:
 
 ```nix
-packages = [
-  (pkgs.writeAliasScriptBin "ls" ''
-    exec ls --color=auto "$@"
-  '')
-];
+let
+  write-alias-script = pkgs.callPackage ./sh/write-alias-script {};
+in {
+  packages = [
+    (write-alias-script.writeAliasScriptBin "ls" ''
+      exec ls --color=auto "$@"
+    '')
+  ];
+}
 ```
 
 Functions:

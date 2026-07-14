@@ -1,5 +1,4 @@
-# This is a Nixpkgs overlay that adds writeAliasScript and writeAliasScriptBin,
-# drop-in replacements for writeShellScript and writeShellScriptBin meant for
+# Drop-in replacements for writeShellScript and writeShellScriptBin meant for
 # emulating shell aliases (which nix-direnv cannot export). The generated
 # script removes the PATH entry it was resolved from before running the given
 # content, so a script named after the command it wraps (e.g. an "ls" script
@@ -11,7 +10,10 @@
 # case) that is exactly right. When it is symlinked into a merged profile
 # (e.g. home-manager's buildEnv), the whole profile bin is dropped for the
 # duration of the alias, which also hides sibling commands from that profile.
-final: prev: let
+{
+  writeShellScript,
+  writeShellScriptBin,
+}: let
   stripSelf = ''
     __nixche_self_dir=''${0%/*}
     IFS=: read -r -a __nixche_path_dirs <<< "$PATH"
@@ -30,6 +32,6 @@ final: prev: let
   '';
 
 in {
-  writeAliasScript = base prev.writeShellScript;
-  writeAliasScriptBin = base prev.writeShellScriptBin;
+  writeAliasScript = base writeShellScript;
+  writeAliasScriptBin = base writeShellScriptBin;
 }

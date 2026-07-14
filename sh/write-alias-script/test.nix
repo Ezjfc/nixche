@@ -2,8 +2,8 @@
 # Run with: nix-instantiate --eval --strict test.nix
 
 let
-  # Mock prev for testing the overlay
-  mockPrev = rec {
+  # Mock pkgs for testing
+  mockPkgs = rec {
     writeShellScript = name: script: ''
       #!/usr/bin/env bash
       ${script}
@@ -11,8 +11,9 @@ let
     writeShellScriptBin = name: script: writeShellScript name script;
   };
 
-  overlay = import ./default.nix;
-  write-alias-utils = overlay {} mockPrev;
+  write-alias-utils = import ./default.nix {
+    inherit (mockPkgs) writeShellScript writeShellScriptBin;
+  };
 
   # An alias calling the very command it is named after
   test1 = write-alias-utils.writeAliasScript "ls" ''

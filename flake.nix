@@ -14,7 +14,7 @@
   outputs = { self, nixpkgs, flake-utils }:
     flake-utils.lib.eachDefaultSystem (system: let
       pkgs = nixpkgs.legacyPackages.${system};
-    in {
+
       packages = {
         create-netbeans-java-platform = pkgs.writeText "create-netbeans-java-platform"
           (builtins.readFile ./java/create-netbeans-java-platform/default.nix);
@@ -23,10 +23,14 @@
         write-alias-script = pkgs.writeText "write-alias-script"
           (builtins.readFile ./sh/write-alias-script/default.nix);
       };
-    }) // {
+
       overlays = {
         neovim-with-lsps = import ./neovim/neovim-with-lsps/default.nix;
-        write-alias-script = import ./sh/write-alias-script/default.nix;
       };
+    in {
+      inherit packages;
+      devShells.default = pkgs.callPackage ./shell.nix { nixche = self; };
+    }) // {
+      inherit overlays;
     };
 }
