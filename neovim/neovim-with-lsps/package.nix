@@ -7,13 +7,12 @@
 # the current is not enough to suit my needs, like "withLspsAndConfigs"...
 
 {
-  stdenvNoCC,
   neovim,
   lib,
-  srcOnly,
+  runCommand,
 
   callPackage,
-  autoRun ? (callPackage ../neovim-with-lsps {}).autoRun,
+  autoRun ? (callPackage ../neovim-auto-run/package.nix {}).autoRun,
 }: let
   needVersion = "0.11.0";
   supportLsp = (builtins.compareVersions neovim.version needVersion) > -1;
@@ -21,16 +20,15 @@
   withLsps' = {
     servers,
     runtimeVersionCheck ? true,
-  }:let
-    autoRunEnv = srcOnly {
-      name = "lsps.lua";
+  }: let
+    autoRunEnv = runCommand "lsps.lua" {
       src = ./lsps.lua;
       buildInputs = builtins.attrValues servers;
-      stdenv = stdenvNoCC;
 
+      __structuredAttrs = true;
       LSPS = servers;
-      NEED_VERSION = if lib.runtimeVersionCheck then needVersion else "";
-    };
+      NEED_VERSION = if runtimeVersionCheck then needVersion else "";
+    } "echo '' > $out";
     nvimWithLsps = autoRun autoRunEnv;
   in nvimWithLsps;
 in {
@@ -40,7 +38,7 @@ in {
     "nixche/neovim/neovim-with-lsps" +
     ": Neovim ${neovim.version} does not support Native LSP. " +
     "Please upgrade to ${needVersion} or above"
-  ) (servers: withLsps' {
+  ); (servers: withLsps' {
     inherit servers;
     runtimeVersionCheck = false;
   });

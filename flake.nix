@@ -14,6 +14,7 @@
   outputs = { self, nixpkgs, flake-utils }:
     flake-utils.lib.eachDefaultSystem (system: let
       pkgs = nixpkgs.legacyPackages.${system};
+      nixche = self.packages.${system};
     in {
       packages = {
         create-netbeans-java-platform = pkgs.writeText "create-netbeans-java-platform"
@@ -22,17 +23,16 @@
           (builtins.readFile ./sh/write-cat-script/default.nix);
         write-alias-script = pkgs.writeText "write-alias-script"
           (builtins.readFile ./sh/write-alias-script/default.nix);
-        neovim-with-lsps = pkgs.writeText "neovim-with-lsps"
-          (builtins.readFile ./neovim/neovim-with-lsps/package.nix);
-        neovim-auto-run = pkgs.writeText "neovim-auto-run"
-          (builtins.readFile ./neovim/neovim-auto-run/package.nix);
+        neovim-with-lsps = pkgs.callPackage ./neovim/neovim-with-lsps/package.nix {};
+        neovim-auto-run = pkgs.callPackage ./neovim/neovim-auto-run/package.nix {};
       };
 
       # `neovim = null` will use the one that is installed externally:
-      devShells.default = pkgs.callPackage ./shell.nix { nixche = self; neovim = null };
+      devShells.default = pkgs.callPackage ./shell.nix { inherit nixche; neovim = null; };
     }) // {
       overlays = {
-        neovim-with-lsps = import ./neovim/neovim-with-lsps/default.nix;
+        neovim-with-lsps = import ./neovim/neovim-with-lsps;
+        neovim-auto-run = import ./neovim/neovim-auto-run;
       };
     };
 }

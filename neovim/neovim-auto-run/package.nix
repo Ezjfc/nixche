@@ -32,7 +32,7 @@
     (builtins.isList value && builtins.all coercible value);
 
   autoRun = env: let
-    luaFile = env.src or env;
+    luaFile = if env ? src then env.src else env;
     envAttrs = lib.mapAttrs (_: toString) (
       lib.filterAttrs (_: coercible) (env.drvAttrs or {})
     ) // { out = "${env}"; };
@@ -50,7 +50,7 @@
       makeWrapper "${neovim}/bin/nvim" "$out/bin/nvim" \
         --add-flags '-c "source ${startScript}"'
     '';
-  in autoRun;
+  in nvimAutoRun;
 in {
   inherit autoRun;
 }

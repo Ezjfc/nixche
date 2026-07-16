@@ -6,17 +6,20 @@
   neovim ? null,
   nil,
 }: let
-  writeAliasScriptBin = (callPackage nixche.packages.write-alias-script {}).writeAliasScriptBin;
-  neovimWithLsps' = (callPackage nixche.packages.neovim-with-lsps { neovim = neovim'; }).withLsps';
-  neovim' = neovim or (writeAliasScriptBin "nvim" "nvim");
+  inherit (nixche.write-alias-script) writeAliasScriptBin;
+  neovimWithLsps' = (nixche.neovim-with-lsps.override {
+    neovim = (writeAliasScriptBin "nvim" "nvim");
+  }).withLsps';
+  # neovim' = if neovim == null then  else neovim;
+  # neovim' = if neovim == null then (writeAliasScriptBin "nvim" "nvim") else neovim;
 
-  neovimAndLsps = neovimWithLsps {
+  neovimAndLsps = neovimWithLsps' {
     servers = {
       inherit nil;
-    }
+    };
   };
 in mkShellNoCC {
-  package = [
+  packages = [
     neovimAndLsps
   ];
 }
