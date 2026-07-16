@@ -1,12 +1,9 @@
-# This is a Nixpkgs overlay that patches Neovim to automatically enable Native
-# LSPs. Kept for backward compatibility: the actual builder lives in
-# package.nix, which can also be called directly with callPackage.
+# This is a Nixpkgs overlay that allows Neovim to automatically enable Native
+# LSPs.
+
 final: prev: {
   neovim = let
-    withLsps = prev.callPackage ./package.nix {};
-    passthru' = {
-      inherit withLsps;
-    };
+    passthru' = prev.callPackage ./package.nix {};
   in prev.neovim.overrideAttrs {
     passthru = (prev.neovim.passthru or {}) // passthru';
   };

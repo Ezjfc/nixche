@@ -24,9 +24,12 @@
           (builtins.readFile ./sh/write-alias-script/default.nix);
         neovim-with-lsps = pkgs.writeText "neovim-with-lsps"
           (builtins.readFile ./neovim/neovim-with-lsps/package.nix);
+        neovim-auto-run = pkgs.writeText "neovim-auto-run"
+          (builtins.readFile ./neovim/neovim-auto-run/package.nix);
       };
 
-      devShells.default = pkgs.callPackage ./shell.nix { nixche = self; };
+      # `neovim = null` will use the one that is installed externally:
+      devShells.default = pkgs.callPackage ./shell.nix { nixche = self; neovim = null };
     }) // {
       overlays = {
         neovim-with-lsps = import ./neovim/neovim-with-lsps/default.nix;
