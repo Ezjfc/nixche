@@ -28,33 +28,40 @@ packages = with pkgs; [
 - `withLsps`: Wraps `nvim` with `-c` flags that call `vim.lsp.enable()` for each server, and adds the server packages to the environment.
 
 ### Write Alias Script (`sh/write-alias-script`)
-Shell script wrappers for emulating shell aliases, which nix-direnv cannot
-export. The generated script removes the `PATH` entry it was resolved from
-before running the given content, so a script named after the command it wraps
-does not recurse into itself.
+Shell script wrappers for emulating bash aliases, which nix-direnv cannot
+export. The argument is the alias text exactly as it would appear in
+`alias name='text'`: it is pasted verbatim and, mirroring alias expansion,
+any arguments are appended behind it (do not add `"$@"` yourself). The
+generated script removes the `PATH` entry it was resolved from before running
+the alias text, so a script named after the command it wraps does not recurse
+into itself.
 
 Usage:
 
 ```nix
 let
-  write-alias-script = pkgs.callPackage ./sh/write-alias-script {};
+  write-alias-script = pkgs.callPackage ./sh/write-alias-script/package.nix {};
 in {
   packages = [
-    (write-alias-script.writeAliasScriptBin "ls" ''
-      exec ls --color=auto "$@"
-    '')
+    # Behaves like `alias ls='ls --color=auto'`:
+    (write-alias-script.writeAliasScriptBin "ls" "ls --color=auto")
   ];
 }
 ```
 
 Functions:
-- `writeAliasScript`: `writeShellScript`, but the script drops its own directory from `PATH` first.
+- `writeAliasScript`: `writeShellScript`, but with alias semantics as above.
 - `writeAliasScriptBin`: same for `writeShellScriptBin`.
 
-Caveat: the directory the script was *found in* is removed. In a devShell or
-plain store bin folder that is exactly the alias package; in a merged profile
-(e.g. home-manager's `buildEnv`) it hides the whole profile bin for the
-duration of the alias.
+Caveats:
+- The directory the script was *found in* (`$0`) is removed. In a devShell or
+  plain store bin folder that is exactly the alias package; in a merged
+  profile (e.g. home-manager's `buildEnv`) it hides the whole profile bin for
+  the duration of the alias.
+- When the alias script is reached through another wrapper by absolute path
+  (e.g. `makeWrapper`), the outer wrapper must strip *its* directory instead;
+  embed `sh/write-alias-script/strip-self.sh` in it the way
+  `neovim/neovim-auto-run` does.
 
 ### Write Cat Script (`sh/write-cat-script`)
 Shell script wrappers that echo the script content to stderr before execution.

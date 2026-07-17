@@ -8,10 +8,8 @@
 }: let
   inherit (nixche.write-alias-script) writeAliasScriptBin;
   neovimWithLsps' = (nixche.neovim-with-lsps.override {
-    neovim = (writeAliasScriptBin "nvim" "nvim");
+    neovim = if neovim == null then (writeAliasScriptBin "nvim" "nvim") else neovim;
   }).withLsps';
-  # neovim' = if neovim == null then  else neovim;
-  # neovim' = if neovim == null then (writeAliasScriptBin "nvim" "nvim") else neovim;
 
   neovimAndLsps = neovimWithLsps' {
     servers = {

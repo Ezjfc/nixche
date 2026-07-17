@@ -20,9 +20,8 @@
         create-netbeans-java-platform = pkgs.writeText "create-netbeans-java-platform"
           (builtins.readFile ./java/create-netbeans-java-platform/default.nix);
         write-cat-script = pkgs.writeText "write-cat-script"
-          (builtins.readFile ./sh/write-cat-script/default.nix);
-        write-alias-script = pkgs.writeText "write-alias-script"
-          (builtins.readFile ./sh/write-alias-script/default.nix);
+          (builtins.readFile ./sh/write-cat-script/default.nix); # TODO
+        write-alias-script = pkgs.callPackage ./sh/write-alias-script/package.nix {};
         neovim-with-lsps = pkgs.callPackage ./neovim/neovim-with-lsps/package.nix {};
         neovim-auto-run = pkgs.callPackage ./neovim/neovim-auto-run/package.nix {};
       };
