@@ -32,23 +32,22 @@
     (builtins.isList value && builtins.all coercible value);
 
   autoRun = env: let
-    luaFile = if env ? src then env.src else env;
+    luaFile = env;
     envAttrs = lib.mapAttrs (_: toString) (
       lib.filterAttrs (_: coercible) (env.drvAttrs or {})
     ) // { out = "${env}"; };
     envFile = writeText "neovim-auto-run-env.lua"
       ("return " + lib.generators.toLua {} envAttrs);
-    startScript = writeText "neovim-auto-run-start.lua" ''
-      loadfile("${luaFile}")(dofile("${envFile}"))
-    '';
+
+    startScript = "source loadfile('${luaFile}')(dofile('${envFile}'))";
+
     nvimAutoRun = runCommand "neovim-auto-run" {
-      buildInputs = [ env ];
       nativeBuildInputs = [ makeWrapper ];
     } ''
       mkdir -p "$out/bin"
       ln -s -t "$out" "${neovim}/share"
       makeWrapper "${neovim}/bin/nvim" "$out/bin/nvim" \
-        --add-flags '-c "source ${startScript}"'
+        --add-flag "-c \"source loadfile('${luaFile}')(dofile('${envFile}'))\""
     '';
   in nvimAutoRun;
 in {

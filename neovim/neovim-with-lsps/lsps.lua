@@ -1,10 +1,12 @@
 local env = ...
+local currentVersion = vim.version.version(.)
+local compareVersion = vim.version.cmp
 
-if env.VERSION ~= "" and vim.version.cmp(vim.version(), env.VERSION) > 0 then
+if env.NEED_VERSION ~= "" and compareVersion(currentVersion, env.NEED_VERSION) > 0 then
   vim.print(
     "nixche/neovim/neovim-with-lsps" ..
-    ": Neovim " .. vim.version() .. "does not support Native LSP. " +
-    "Please upgrade to " .. env.VERSION .. " or above"
+    ": Neovim " .. tostring(currentVersion) .. "does not support Native LSP. " ..
+    "Please upgrade to " .. env.NEED_VERSION .. " or above"
   )
 else
   local mopt = vim.o.messagesopt

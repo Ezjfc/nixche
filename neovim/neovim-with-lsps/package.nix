@@ -12,7 +12,7 @@
   runCommand,
 
   callPackage,
-  autoRun ? (callPackage ../neovim-auto-run/package.nix {}).autoRun,
+  autoRun ? (callPackage ../neovim-auto-run/package.nix { inherit neovim; }).autoRun,
 }: let
   needVersion = "0.11.0";
   supportLsp = (builtins.compareVersions neovim.version needVersion) > -1;
@@ -28,7 +28,7 @@
       __structuredAttrs = true;
       LSPS = servers;
       NEED_VERSION = if runtimeVersionCheck then needVersion else "";
-    } "echo '' > $out";
+    } "cp $src $out";
     nvimWithLsps = autoRun autoRunEnv;
   in nvimWithLsps;
 in {
