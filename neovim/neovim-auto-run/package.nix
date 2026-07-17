@@ -18,12 +18,6 @@
   runCommand,
   makeWrapper,
 }: let
-  # The wrapper strips its own directory from PATH before exec, so that when
-  # the wrapped nvim resolves "nvim" through PATH again (write-alias-script
-  # falling through to an externally installed Neovim) the lookup cannot loop
-  # back into this wrapper. Shared with sh/write-alias-script.
-  stripSelf = builtins.readFile ../../sh/write-alias-script/strip-self.sh;
-
   # Mirrors how derivation attributes appear in a structured-attrs build:
   # scalars coerce to strings while lists and attrsets keep their shape (their
   # elements coerced recursively). Attributes that cannot coerce (functions...)
@@ -62,7 +56,6 @@
       mkdir -p "$out/bin"
       ln -s -t "$out" "${neovim}/share"
       makeWrapper "${neovim}/bin/nvim" "$out/bin/nvim" \
-        --run ${lib.escapeShellArg stripSelf} \
         --add-flag "-c" \
         --add-flag ${lib.escapeShellArg startScript}
     '';

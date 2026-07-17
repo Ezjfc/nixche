@@ -26,6 +26,7 @@ packages = with pkgs; [
 ```
 
 - `withLsps`: Wraps `nvim` with `-c` flags that call `vim.lsp.enable()` for each server, and adds the server packages to the environment.
+- `withLsps'`: Provides more control.
 
 ### Write Alias Script (`sh/write-alias-script`)
 Shell script wrappers for emulating bash aliases, which nix-direnv cannot

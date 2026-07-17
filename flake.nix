@@ -27,7 +27,7 @@
         create-netbeans-java-platform = pkgs.writeText "create-netbeans-java-platform"
           (builtins.readFile ./java/create-netbeans-java-platform);
         write-cat-script = pkgs.writeText "write-cat-script"
-          (builtins.readFile ./sh/write-cat-script)
+          (builtins.readFile ./sh/write-cat-script);
       };
 
       # `neovim = null` will use the one that is installed externally:
