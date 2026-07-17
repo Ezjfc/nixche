@@ -29,7 +29,8 @@ packages = with pkgs; [
 
 ### Write Alias Script (`sh/write-alias-script`)
 Shell script wrappers for emulating bash aliases, which nix-direnv cannot
-export. The argument is the alias text exactly as it would appear in
+export (see [direnv/direnv#73](https://github.com/direnv/direnv/issues/73)).
+The argument is the alias text exactly as it would appear in
 `alias name='text'`: it is pasted verbatim and, mirroring alias expansion,
 any arguments are appended behind it (do not add `"$@"` yourself). The
 generated script removes the `PATH` entry it was resolved from before running

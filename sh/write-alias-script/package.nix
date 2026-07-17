@@ -1,5 +1,6 @@
 # Drop-in replacements for writeShellScript and writeShellScriptBin meant for
-# emulating bash aliases (which nix-direnv cannot export). The argument is the
+# emulating bash aliases, which nix-direnv cannot export
+# (https://github.com/direnv/direnv/issues/73). The argument is the
 # alias text exactly as it would appear in `alias name='text'`: it is pasted
 # verbatim and, mirroring alias expansion, whatever is typed after the command
 # is appended behind it. So
