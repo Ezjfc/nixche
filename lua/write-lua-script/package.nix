@@ -18,6 +18,9 @@
 # `<name>-source.lua` and `loadfile`d by the wrapper. Attributes that cannot coerce
 # (functions, null...) are dropped, just like in a structured-attrs build.
 #
+# `writeLuaScriptShare` is the same, except the wrapper lands in a directory as
+# `<out>/share/<name>.lua` instead of being the output file itself.
+#
 # Caveat: strings are rendered by `lib.generators.toLua` through `toJSON`, so a control
 # character other than \t \r \n \b \f in any string attribute (including `text`) comes out
 # as \uXXXX, which LuaJIT cannot parse. Ordinary Lua source and store paths are unaffected.
@@ -25,6 +28,7 @@
 {
   lib,
   writeText,
+  writeTextFile,
 }: let
   # Mirrors how derivation attributes appear in a structured-attrs build:
   # scalars coerce to strings while lists and attrsets keep their shape (their
@@ -48,12 +52,18 @@
     then map coerce value
     else toString value;
 
-  writeLuaScript = attrs @ { name, text, ... }: let
+  wrapper = attrs @ { name, text, ... }: let
     source = writeText "${name}-source.lua" text;
     env = lib.mapAttrs (_: coerce) (lib.filterAttrs (_: coercible) attrs);
-  in writeText "${name}.lua" ''
+  in ''
     return assert(loadfile(${builtins.toJSON "${source}"}))(${lib.generators.toLua {} env})
   '';
+
+  base = out: attrs @ { name, ... }: out name (wrapper attrs);
 in {
-  inherit writeLuaScript;
+  writeLuaScript = base (name: writeText "${name}.lua");
+  writeLuaScriptShare = base (name: text: writeTextFile {
+    inherit name text;
+    destination = "/share/${name}.lua";
+  });
 }

@@ -8,10 +8,11 @@
 { lib ? import <nixpkgs/lib> }: let
   # Mock of writeText: coerces to a recognisable store path like the real one, while
   # keeping the written content around for the assertions below.
-  mockPkgs = {
-    writeText = name: text: {
+  mockPkgs = rec {
+    writeText = name: text: writeTextFile { inherit name text; };
+    writeTextFile = { name, text, destination ? "", ... }: {
       outPath = "/nix/store/mock-${name}";
-      inherit text;
+      inherit text destination;
     };
   };
 
@@ -20,7 +21,7 @@
 
   write-lua-script = import ./package.nix {
     inherit lib;
-    inherit (mockPkgs) writeText;
+    inherit (mockPkgs) writeText writeTextFile;
   };
 
   # Test a plain script with a derivation list attribute.
@@ -51,13 +52,23 @@
     passthru = _: null;
   };
 
+  # Test the share variant: same wrapper, only placed in a directory.
+  test4 = write-lua-script.writeLuaScriptShare {
+    name = "greet";
+    text = ''
+      local env = ...
+      print(env.name, env.buildInputs[1])
+    '';
+    buildInputs = [ mockHello ];
+  };
+
   # POSIX ERE as used by builtins.match rejects backslash-escaped brackets and
   # parentheses, so they are matched through one-character classes instead.
   binding = key: ''.*[[]"${key}"[]] = '';
 
 in {
   inherit (test1) text;
-  paths = map toString [ test1 test2 test3 ];
+  paths = map toString [ test1 test2 test3 test4 ];
 
   # Simple assertion tests
   assertions = {
@@ -79,5 +90,10 @@ in {
 
     test3DropsFunction = builtins.match ".*passthru.*" test3.text == null;
     test3KeepsRest = builtins.match ''${binding "keep"}"yes".*'' test3.text != null;
+
+    # The share variant only relocates the wrapper.
+    test4IsDirectory = "${test4}" == "/nix/store/mock-greet";
+    test4Destination = test4.destination == "/share/greet.lua";
+    test4SameWrapper = test4.text == test1.text;
   };
 }

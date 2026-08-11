@@ -43,6 +43,9 @@ return assert(loadfile("/nix/store/…-greet-source.lua"))({
 Functions:
 - `writeLuaScript`: takes the attribute set described above, returns the wrapper
   `.lua` file.
+- `writeLuaScriptShare`: same, but the output is a directory holding the wrapper
+  at `share/<name>.lua`, for when the script has to be part of a package rather
+  than be one.
 
 Caveats:
 - Coercion mirrors structured attrs: scalars become strings, lists and attrsets
