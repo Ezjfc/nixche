@@ -9,6 +9,52 @@ Utilities for managing NetBeans Java Platform configurations.
 - `mkNetBeansJavaPlatform`: Creates a NetBeans Java Platform XML configuration (string).
 - `installNetBeansJavaPlatform`: Generates a shell script (string) to install Java Platform configuration to NetBeans.
 
+### Write Lua Script (`lua/write-lua-script`)
+Writes a `.lua` file that hands the Lua script the attribute set it was defined
+with, the way a structured-attrs build exposes its derivation attributes to the
+builder. The script receives the attributes through vararg.
+
+Usage:
+
+```nix
+let
+  write-lua-script = pkgs.callPackage ./lua/write-lua-script/package.nix {};
+in write-lua-script.writeLuaScript {
+  name = "greet";
+  text = ''
+    local env = ...
+    print(env.name, env.buildInputs[1])
+  '';
+  buildInputs = [ pkgs.hello ];
+}
+```
+
+`name` and `text` (the Lua source, as a string) are required; every other
+attribute is coerced and passed along. The result is a wrapper `.lua` file:
+
+```lua
+return assert(loadfile("/nix/store/…-greet-source.lua"))({
+  ["buildInputs"] = { "/nix/store/…-hello" },
+  ["name"] = "greet",
+  ["text"] = "local env = ...\nprint(env.name, env.buildInputs[1])\n"
+})
+```
+
+Functions:
+- `writeLuaScript`: takes the attribute set described above, returns the wrapper
+  `.lua` file.
+
+Caveats:
+- Coercion mirrors structured attrs: scalars become strings, lists and attrsets
+  keep their shape, and attributes that cannot coerce (functions, `null`) are
+  dropped.
+- Strings are rendered by `lib.generators.toLua` through `toJSON`, so a control
+  character other than `\t \r \n \b \f` in any string attribute (including
+  `text`) comes out as `\uXXXX`, which LuaJIT cannot parse. Ordinary Lua source
+  and store paths are unaffected.
+- `text` ends up in the store twice: as `<name>-source.lua`, and as a string
+  inside the wrapper's table.
+
 ### Write Alias Script (`sh/write-alias-script`)
 Shell script wrappers for emulating bash aliases, which nix-direnv cannot
 export (see [direnv/direnv#73](https://github.com/direnv/direnv/issues/73)).

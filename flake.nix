@@ -20,6 +20,7 @@
         create-netbeans-java-platform' = pkgs.callPackage ./java/create-netbeans-java-platform/package.nix {};
         write-cat-script' = pkgs.callPackage ./sh/write-cat-script/package.nix {};
         write-alias-script = pkgs.callPackage ./sh/write-alias-script/package.nix {};
+        write-lua-script = pkgs.callPackage ./lua/write-lua-script/package.nix {};
         neovim-with-lsps = pkgs.callPackage ./neovim/neovim-with-lsps/package.nix {};
         neovim-auto-run = pkgs.callPackage ./neovim/neovim-auto-run/package.nix {};
 
