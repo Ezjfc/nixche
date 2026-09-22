@@ -16,14 +16,16 @@
       pkgs = nixpkgs.legacyPackages.${system};
       nixche = self.packages.${system};
     in {
-      packages = {
-        create-netbeans-java-platform' = pkgs.callPackage ./java/create-netbeans-java-platform/package.nix {};
-        write-cat-script' = pkgs.callPackage ./sh/write-cat-script/package.nix {};
-        write-alias-script = pkgs.callPackage ./sh/write-alias-script/package.nix {};
-        write-lua-script = pkgs.callPackage ./lua/write-lua-script/package.nix {};
-        neovim-with-lsps = pkgs.callPackage ./neovim/neovim-with-lsps/package.nix {};
-        neovim-auto-run = pkgs.callPackage ./neovim/neovim-auto-run/package.nix {};
-
+      packages = let
+        livePackages = {
+          create-netbeans-java-platform' = pkgs.callPackage ./java/create-netbeans-java-platform/package.nix {};
+          write-cat-script' = pkgs.callPackage ./sh/write-cat-script/package.nix {};
+          write-alias-script = pkgs.callPackage ./sh/write-alias-script/package.nix {};
+          write-lua-script = pkgs.callPackage ./lua/write-lua-script/package.nix {};
+          neovim-with-lsps = pkgs.callPackage ./neovim/neovim-with-lsps/package.nix {};
+          neovim-auto-run = pkgs.callPackage ./neovim/neovim-auto-run/package.nix {};
+        };
+      in {
         # Deprecated items, for backward compatibility:
         create-netbeans-java-platform =
           builtins.warn ''
@@ -37,7 +39,7 @@
           ''
           (pkgs.writeText "write-cat-script"
             (builtins.readFile ./sh/write-cat-script));
-      };
+      } // livePackages;
 
       # `neovim = null` will use the one that is installed externally:
       devShells.default = pkgs.callPackage ./shell.nix { inherit nixche; neovim = null; };
