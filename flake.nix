@@ -25,10 +25,18 @@
         neovim-auto-run = pkgs.callPackage ./neovim/neovim-auto-run/package.nix {};
 
         # Deprecated items, for backward compatibility:
-        create-netbeans-java-platform = pkgs.writeText "create-netbeans-java-platform"
-          (builtins.readFile ./java/create-netbeans-java-platform);
-        write-cat-script = pkgs.writeText "write-cat-script"
-          (builtins.readFile ./sh/write-cat-script);
+        create-netbeans-java-platform =
+          builtins.warn ''
+            Warning: `create-netbeans-java-platform` is deprecated; use `create-netbeans-java-platform'` instead.
+          ''
+          (pkgs.writeText "create-netbeans-java-platform"
+            (builtins.readFile ./java/create-netbeans-java-platform));
+        write-cat-script =
+          builtins.warn ''
+            Warning: `write-cat-script` is deprecated; use `write-cat-script'` instead.
+          ''
+          (pkgs.writeText "write-cat-script"
+            (builtins.readFile ./sh/write-cat-script));
       };
 
       # `neovim = null` will use the one that is installed externally:
