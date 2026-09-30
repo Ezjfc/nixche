@@ -1,3 +1,6 @@
+
+TODO: helper to make fzf xdg opener
+
 # nixche
 A collection of niche Nix utilities that fulfil quite specific tasks.
 
